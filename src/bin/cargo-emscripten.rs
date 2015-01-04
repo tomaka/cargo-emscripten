@@ -29,6 +29,7 @@ Compile a local package and all of its dependencies
 
 Usage:
     cargo-emscripten [options]
+    cargo emscripten [options]
 
 Options:
     -h, --help               Print this message
