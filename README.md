@@ -8,6 +8,10 @@ Builds your Cargo projects for emscripten.
 
 [Emscripten will soon upgrade to LLVM 3.5](https://github.com/kripken/emscripten-fastcomp/issues/51). In the meanwhile, **some code will produce compilation errors in emscripten**. If you see an assertion that failed with `some i64 things that we can't allow yet`, it's because of this.
 
+## Pre-Rust-1.0 warning
+
+This project is in stand-by before Rust becomes a bit more stable.
+
 ## Prerequisites
 
 - You have to install [the `incoming` version of emscripten](http://kripken.github.io/emscripten-site/docs/tools_reference/emsdk.html#how-do-i-track-the-latest-emscripten-development-with-the-sdk).
