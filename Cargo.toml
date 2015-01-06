@@ -13,5 +13,4 @@ regex = "*"
 regex_macros = "*"
 
 [dependencies.cargo]
-git = "https://github.com/tomaka/cargo"
-branch = "extract-commands-system"
+git = "https://github.com/rust-lang/cargo"
