@@ -68,18 +68,24 @@ fn main() {
 
     let engine = cargo_emscripten::EmscriptenEngine { emcc: options.flag_emcc.map(|s| Path::new(s)) };
 
-    let mut opts = CompileOptions {
-        env: env,
-        shell: &mut shell,
-        jobs: options.flag_jobs,
-        target: options.flag_target.as_ref().map(|t| t.as_slice()),
-        dev_deps: false,
-        features: options.flag_features.as_slice(),
-        no_default_features: options.flag_no_default_features,
-        spec: options.flag_package.as_ref().map(|s| s.as_slice()),
-        lib_only: options.flag_lib,
-        exec_engine: Some(Arc::new(box engine as Box<ExecEngine>)),
-    };
+    let result = {
+        let mut opts = CompileOptions {
+            env: env,
+            shell: &mut shell,
+            jobs: options.flag_jobs,
+            target: options.flag_target.as_ref().map(|t| t.as_slice()),
+            dev_deps: false,
+            features: options.flag_features.as_slice(),
+            no_default_features: options.flag_no_default_features,
+            spec: options.flag_package.as_ref().map(|s| s.as_slice()),
+            lib_only: options.flag_lib,
+            exec_engine: Some(Arc::new(box engine as Box<ExecEngine>)),
+        };
 
-    ops::compile(&root, &mut opts).unwrap();
+        ops::compile(&root, &mut opts)
+    };
+    
+    cargo::process_executed(result.map(|_| None::<()>).map_err(|err| {
+        cargo::util::CliError::from_boxed(err, 101)
+    }), &mut shell);
 }
