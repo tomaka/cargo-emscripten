@@ -1,3 +1,5 @@
+#![feature(old_orphan_check)]
+
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate cargo;
 extern crate cargo_emscripten;
@@ -5,12 +7,12 @@ extern crate docopt;
 
 use std::sync::Arc;
 
-use cargo::ops::{mod, CompileOptions, ExecEngine};
+use cargo::ops::{self, CompileOptions, ExecEngine};
 use cargo::util::important_paths::{find_root_manifest_for_cwd};
 
 use docopt::Docopt;
 
-#[deriving(RustcDecodable)]
+#[derive(RustcDecodable)]
 struct Options {
     flag_package: Option<String>,
     flag_jobs: Option<uint>,
