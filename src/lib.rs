@@ -12,6 +12,8 @@ use cargo::util::{mod, CargoResult, ProcessError, ProcessBuilder};
 use std::io::fs::{File, PathExtensions};
 use std::io::process::ProcessOutput;
 
+mod std_inc;
+
 pub struct EmscriptenEngine {
     pub emcc: Option<Path>,
 }
@@ -85,13 +87,27 @@ fn exec(command: CommandPrototype, with_output: bool, engine: &EmscriptenEngine)
     // dropping "dereferenceable" from the content of the file
     drop_unsupported_ir(&ll_output_file);
 
+    // writing libstd in the target directory
+    let libstd = std_inc::write_std(&Path::new(out_dir.clone()));
+
+    // building the "emcc" comand
+    let emcc = {
+        let emcc = engine.emcc.as_ref().map(|p| p.as_str().unwrap()).unwrap_or("emcc");
+        
+        let mut process = util::process(emcc).unwrap();
+        process = process.arg(ll_output_file);
+
+        for lib in libstd.into_iter() {
+            process = process.arg(lib);
+        }
+
+        process = process.arg("-lGL").arg("-lSDL").arg("-s").arg("USE_SDL=2");
+        process = process.arg("-o").arg(format!("{}/{}.html", out_dir, crate_name));
+        process
+    };
+
     // executing emcc
-    let emcc = engine.emcc.as_ref().map(|p| p.as_str().unwrap()).unwrap_or("emcc");
-    do_exec(util::process(emcc).unwrap()
-                .arg(ll_output_file)
-                .arg("-lGL").arg("-lSDL").arg("-s").arg("USE_SDL=2")
-                .arg("-o").arg(format!("{}/{}.html", out_dir, crate_name))
-        , with_output)
+    do_exec(emcc, with_output)
 }
 
 fn do_exec(process: ProcessBuilder, with_output: bool) -> Result<Option<ProcessOutput>, ProcessError> {
