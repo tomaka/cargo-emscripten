@@ -84,9 +84,6 @@ fn exec(command: CommandPrototype, with_output: bool, engine: &EmscriptenEngine)
     let ll_output_file = Path::new(format!("{}/{}.ll", out_dir, crate_name));
     assert!(ll_output_file.exists());
 
-    // dropping "dereferenceable" from the content of the file
-    drop_unsupported_ir(&ll_output_file);
-
     // writing libstd in the target directory
     let libstd = std_inc::write_std(&Path::new(out_dir.clone()));
 
@@ -116,21 +113,4 @@ fn do_exec(process: ProcessBuilder, with_output: bool) -> Result<Option<ProcessO
     } else {
         process.exec().map(|_| None)
     }
-}
-
-fn drop_unsupported_ir(file: &Path) {
-    let mut content = File::open(file).unwrap().read_to_string().unwrap();
-
-    loop {
-        let pos = match content.as_slice().find_str("dereferenceable(") {
-            Some(p) => p,
-            None => break
-        };
-
-        let len = content.as_slice().slice_from(pos).find(')').unwrap();
-
-        content = format!("{}{}", content.slice_to(pos), content.slice_from(pos + len + 1));
-    }
-
-    write!(&mut File::create(file).unwrap(), "{}", content).unwrap();
 }
