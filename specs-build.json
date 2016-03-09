@@ -1,0 +1,12 @@
+{
+  "data-layout": "e-p:32:32-i64:64-v128:32:128-n32-S128",
+  "llvm-target": "i686-unknown-linux-gnu",
+  "target-endian": "little",
+  "target-word-size": "32",
+  "arch": "x86",
+  "os": "linux",
+  "morestack": false,
+  "dynamic-linking": true,
+  "executables": true,
+  "no-compiler-rt": true
+}
